@@ -24,3 +24,4 @@ class Button(object):
         
         self.name = name
         self.widget = widget
+        self.tab = None

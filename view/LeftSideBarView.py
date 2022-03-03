@@ -61,25 +61,30 @@ class LeftSideBarView(QWidget):
     
     def add_button(self, btn: Button):
         
-        tab = Tab(btn.name)       
-        self.buttons.append(tab)
-        tab.button.clicked.connect(lambda: self.button_clicked(btn, tab))
-        
+        tab = Tab(btn.name)
+        btn.tab = tab
+        self.buttons.append(btn)
+        tab.button.clicked.connect(lambda: self.button_clicked(btn))
+
         self.button_layout.addWidget(tab)
+
+        if self.current_widget is None:
+            self.deactivate_button(self.buttons[0])
+            self.set_content(btn)
         
         
-    def button_clicked(self, btn: Button, tab: Tab):
-        self.deactivate_button(tab)
+    def button_clicked(self, btn: Button):
+        self.deactivate_button(btn)
         self.set_content(btn)
         
             
-    def deactivate_button(self, button: Tab):
+    def deactivate_button(self, button: Button):
         k: Tab
         for k in self.buttons:
-            k.setEnabledButton(True)
+            k.tab.setEnabledButton(True)
         
             
-        button.setEnabledButton(False)
+        button.tab.setEnabledButton(False)
         
         
     def set_content(self, btn: Button):
@@ -90,3 +95,4 @@ class LeftSideBarView(QWidget):
 
         self.current_widget = btn.widget(btn.name)
         self.content_layout.addWidget(self.current_widget)
+        
