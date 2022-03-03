@@ -11,10 +11,15 @@ class LogWidgetView(QtWidgets.QWidget):
         
         self.logList = QtWidgets.QPlainTextEdit()
         self.logList.setReadOnly(True)
+
+        for log in self.model.log:
+            self.logList.appendPlainText(log)
         
         self.main_Layout.addWidget(self.logList)
         
         self.main_Layout.setContentsMargins(0,0,0,0)
+        
+        GlobalLog.subscribe_to_log(self.add_to_log_list)
         
 
     def add_to_log_list(self, log):
@@ -23,4 +28,4 @@ class LogWidgetView(QtWidgets.QWidget):
         
     def deleteLater(self) -> None:
         super().deleteLater()
-        self.model.LogEventHandler.log_unsubscribe(self.add_to_log_list)
+        GlobalLog.unsubscribe_to_log(self.add_to_log_list)

@@ -13,16 +13,16 @@ class PortaMain(object):
 
         
         
-        self.log_widget = None
+        self.log_widget = LogWidget()
         self.left_side_bar = LeftSideBar(self.window.content_widget)
         
         
-        self.left_side_bar.add_new_button("Dashboard", QPushButton)
-        self.left_side_bar.add_new_button("Devices", QPushButton)
-        self.left_side_bar.add_new_button("Gamehosts", QPushButton)
-        self.left_side_bar.add_new_button("Settings", QPushButton)
-        self.left_side_bar.add_new_button("Performance", QPushButton)
-        # self.left_side_bar.add_new_button("Log", self.log_widget.window)
+        self.left_side_bar.add_new_button("Dashboard", self.log_widget)
+        self.left_side_bar.add_new_button("Devices", self.log_widget)
+        self.left_side_bar.add_new_button("Gamehosts", self.log_widget)
+        self.left_side_bar.add_new_button("Settings", self.log_widget)
+        self.left_side_bar.add_new_button("Performance", self.log_widget)
+        self.left_side_bar.add_new_button("Log", self.log_widget)
         
         
         self.window.show()

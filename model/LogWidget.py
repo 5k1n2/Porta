@@ -1,4 +1,4 @@
-import model.GlobalLog
+from model import GlobalLog
 import view.LogWidgetView
 
 class LogWidget(object):
@@ -6,14 +6,15 @@ class LogWidget(object):
         
         self.log = []
         self.window = None
-        model.GlobalLog.subscribe_to_log(self.update_log)
-        model.GlobalLog.add_to_log("New Log Window added")
         
-        self.window = self.get_window()
+        
+        self.window = None
         
     def get_window(self):
         
+        self.log = GlobalLog.log
         return view.LogWidgetView.LogWidgetView(self)
     
-    def update_log(self, msg):
-        self.log.append(msg)
+    
+        
+    

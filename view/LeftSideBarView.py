@@ -5,6 +5,7 @@ from PySide6.QtWidgets import QWidget, QPlainTextEdit, QPushButton, QVBoxLayout,
 from PySide6.QtGui import Qt, QPixmap
 from PySide6 import QtSvgWidgets, QtSvg
 from view.Tab import Tab
+from model import GlobalLog
 
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
@@ -93,6 +94,7 @@ class LeftSideBarView(QWidget):
             self.content_layout.removeWidget(self.current_widget)
             # self.current_widget.deleteLater()
 
-        self.current_widget = btn.widget(btn.name)
+        self.current_widget = btn.widget.get_window()
         self.content_layout.addWidget(self.current_widget)
+        GlobalLog.add_to_log("{} Site opened".format(btn.name))
         
