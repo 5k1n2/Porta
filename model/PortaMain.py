@@ -1,8 +1,9 @@
 from view.PortaMainView import PortaMainView
 from model.LeftSideBar import LeftSideBar
 from model.LogWidget import LogWidget
+from model.Dashboard import Dasboard
+from model import ActiveEvent
 
-from PySide6.QtWidgets import QPushButton
 
 
 class PortaMain(object):
@@ -11,13 +12,15 @@ class PortaMain(object):
         self.window = self.get_window()
         
 
-        
+        self.active = False
         
         self.log_widget = LogWidget()
-        self.left_side_bar = LeftSideBar(self.window.content_widget)
+        self.left_side_bar = LeftSideBar(self.window.content_widget, self)
+        
+        self.dasboard = Dasboard()
         
         
-        self.left_side_bar.add_new_button("Dashboard", self.log_widget)
+        self.left_side_bar.add_new_button("Dashboard", self.dasboard)
         self.left_side_bar.add_new_button("Devices", self.log_widget)
         self.left_side_bar.add_new_button("Gamehosts", self.log_widget)
         self.left_side_bar.add_new_button("Settings", self.log_widget)
@@ -31,3 +34,14 @@ class PortaMain(object):
         
     def get_window(self):
         return PortaMainView()
+    
+    
+    def start_server(self):
+        self.active = True
+        ActiveEvent.update_active(True)
+        
+    def stop_server(self):
+        self.active = False
+        ActiveEvent.update_active(False)
+        
+        

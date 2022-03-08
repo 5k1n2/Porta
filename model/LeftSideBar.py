@@ -1,8 +1,16 @@
+from __future__ import annotations
+
 from view.LeftSideBarView import LeftSideBarView 
 
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from model.PortaMain import PortaMain
+    
+
 class LeftSideBar(object):
-    def __init__(self, content_widget) -> None:
+    def __init__(self, content_widget, model: PortaMain) -> None:
         
+        self.model = model
         self.buttons = []
         self.content_widget = content_widget
         self.left_side_bar = self.get_window()    

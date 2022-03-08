@@ -38,3 +38,4 @@ class Tab(QWidget):
         
     def setEnabledButton(self, bool):
         self.button.setEnabled(bool)
+        

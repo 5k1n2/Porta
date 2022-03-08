@@ -5,7 +5,7 @@ from PySide6.QtWidgets import QWidget, QPlainTextEdit, QPushButton, QVBoxLayout,
 from PySide6.QtGui import Qt, QPixmap
 from PySide6 import QtSvgWidgets, QtSvg
 from view.Tab import Tab
-from model import GlobalLog
+from model import GlobalLog, ActiveEvent
 
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
@@ -18,6 +18,7 @@ class LeftSideBarView(QWidget):
         
         self.parent = parent
         self.model = model
+        self.main_model = model.model
         self.setFixedWidth(200)
         self.buttons = []
         self.current_widget = None
@@ -48,7 +49,30 @@ class LeftSideBarView(QWidget):
         self.coloredWidgetLayout.addLayout(self.button_layout)
         self.coloredWidgetLayout.addItem(QSpacerItem(1,1, QSizePolicy.MinimumExpanding, QSizePolicy.Expanding))
         
+        
         self.setLayout(self.mainLayout)
+
+
+        # Add start stop Button
+
+        self.startButton = Tab("Start")
+        self.stopButton = Tab("Stop")
+        self.stopButton.setEnabled(False)
+        
+        self.coloredWidgetLayout.addWidget(self.startButton)
+        self.coloredWidgetLayout.addWidget(self.stopButton)
+        
+        self.startButton.button.clicked.connect(self.main_model.start_server)
+        self.stopButton.button.clicked.connect(self.main_model.stop_server)
+
+        ActiveEvent.subscribe_to_activechange(self.update_startButtons)
+        
+        self.lbl_active = QLabel("None")
+        self.coloredWidgetLayout.addWidget(self.lbl_active, alignment=Qt.AlignCenter)
+        
+        ActiveEvent.update_active(False)
+        
+        
         
         self.mainLayout.setContentsMargins(0,0,0,0)
         
@@ -92,9 +116,22 @@ class LeftSideBarView(QWidget):
 
         if(self.current_widget is not None):
             self.content_layout.removeWidget(self.current_widget)
-            # self.current_widget.deleteLater()
+            self.current_widget.deleteLater()
 
         self.current_widget = btn.widget.get_window()
         self.content_layout.addWidget(self.current_widget)
         GlobalLog.add_to_log("{} Site opened".format(btn.name))
         
+
+    def update_startButtons(self, active):
+        if(active):
+            self.startButton.setEnabled(False)
+            self.stopButton.setEnabled(True)
+            self.lbl_active.setText("Server Online")
+            
+            
+        else:
+            self.startButton.setEnabled(True)
+            self.stopButton.setEnabled(False)
+            self.lbl_active.setText("Server Offline")
+            

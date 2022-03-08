@@ -8,8 +8,6 @@ class LogWidget(object):
         self.window = None
         
         
-        self.window = None
-        
     def get_window(self):
         
         self.log = GlobalLog.log
