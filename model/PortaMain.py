@@ -21,7 +21,7 @@ class PortaMain(object):
         
         
         self.left_side_bar.add_new_button("Dashboard", self.dasboard)
-        self.left_side_bar.add_new_button("Devices", self.log_widget)
+        self.left_side_bar.add_new_button("Devices", self.dasboard)
         self.left_side_bar.add_new_button("Gamehosts", self.log_widget)
         self.left_side_bar.add_new_button("Settings", self.log_widget)
         self.left_side_bar.add_new_button("Performance", self.log_widget)
