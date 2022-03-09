@@ -11,11 +11,13 @@ class DeviceModel(object):
         self.connected_Port = "Port"
         self.inputs = []
         self.active_status = False
+        self.data = None
         
         
     def get_device_widget(self):
         
-        self.window = DeviceWidget(self)
+        if(self.window is None):
+            self.window = DeviceWidget(self)
         return self.window
     
     def open_log(self):

@@ -1,4 +1,5 @@
-from PySide6 import QtCore, QtWidgets
+import sys
+from PySide6 import QtCore, QtGui, QtWidgets
 from math import floor
 
 
@@ -57,6 +58,7 @@ class VertexFlowLayout(QtWidgets.QLayout):
 
     def heightForWidth(self, width):
         height = self.doLayout(QtCore.QRect(0, 0, width, 0), True)
+                    
         return height
 
     def setGeometry(self, rect):
@@ -111,7 +113,7 @@ class VertexFlowLayout(QtWidgets.QLayout):
         
         count = 0
         for item in self.itemList:
-            
+            print(item)
             column = 0
             rowcount = 0
             if(count != 0):           
@@ -122,8 +124,7 @@ class VertexFlowLayout(QtWidgets.QLayout):
             rowcount = rowcount * self.sizepercard + self.spaceX    
             column = column * (self.spaceY + item.sizeHint().height()) + self.spaceY
             item.setGeometry(QtCore.QRect(QtCore.QPoint(rowcount, column), item.sizeHint()))
-            count += 1
-        
+            count += 1        
 
         
         return self.height

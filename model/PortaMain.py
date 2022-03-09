@@ -3,7 +3,7 @@ from model.LeftSideBar import LeftSideBar
 from model.LogWidget import LogWidget
 from model.Dashboard import Dasboard
 from model import ActiveEvent
-
+from Sockets.SocketReader import SocketReader
 
 
 class PortaMain(object):
@@ -11,7 +11,8 @@ class PortaMain(object):
         
         self.window = self.get_window()
         
-
+        self.socketReader = None
+        self.devices = []
         self.active = False
         
         self.log_widget = LogWidget()
@@ -39,9 +40,19 @@ class PortaMain(object):
     def start_server(self):
         self.active = True
         ActiveEvent.update_active(True)
+        self.socketReader = SocketReader(self)
+        self.socketReader.setObjectName("SocketReaderThread")
+        self.socketReader.newDevice.connect(self.add_device)
+        self.socketReader.start()
         
     def stop_server(self):
         self.active = False
         ActiveEvent.update_active(False)
+        self.socketReader.stop()
+        self.socketReader.join()
         
+        self.socketReader = None
         
+    def add_device(self, device):
+        # self.devices.append(device)
+        self.dasboard.window.add_device(device.get_device_widget())
