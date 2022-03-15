@@ -25,3 +25,6 @@ class DeviceModel(object):
         
     def set_connection_status(self, active: bool):
         self.active_status = active
+        if(self.window is not None):
+            self.window.set_border_color()
+        

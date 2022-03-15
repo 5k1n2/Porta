@@ -101,7 +101,7 @@ class DeviceWidget(QWidget):
 
         self.main_layout.addLayout(self.buttonLayout)
         
-        self.colored_widget.setProperty("connected", "red")
+        self.colored_widget.setProperty("active_status", self.model.active_status)
         
         self.set_border_color()
         
@@ -118,21 +118,21 @@ class DeviceWidget(QWidget):
                             
                         }
                         
-                        QWidget[connected="green"]{ 
+                        QWidget[active_status="green"]{ 
                             border-style: solid;
                             border-color: #a0ff99;
                             border-width: 3px;
                             
                             }
                             
-                        QWidget[connected="yellow"]{ 
+                        QWidget[active_status="yellow"]{ 
                             border-style: solid;
                             border-color: #dcff7d;
                             border-width: 3px;
                             
                             }
                             
-                        QWidget[connected="red"]{ 
+                        QWidget[active_status="red"]{ 
                             border-style: solid;
                             border-color: #ff8a7d;
                             border-width: 3px;
@@ -155,7 +155,7 @@ class DeviceWidget(QWidget):
                             """)
     def start_button_clicked(self):
         rslt = self.model.enable_device()
-        self.colored_widget.setProperty("connected", "green")
+        self.colored_widget.setProperty("active_status", "green")
         self.set_border_color()
         if(rslt):
             self.startButton.setEnabled(False)
@@ -163,7 +163,7 @@ class DeviceWidget(QWidget):
     
     def stop_button_clicked(self):
         rslt = self.model.disable_device()
-        self.colored_widget.setProperty("connected", "red")
+        self.colored_widget.setProperty("active_status", "red")
         self.set_border_color()
         if(rslt):
             self.startButton.setEnabled(True)
@@ -175,13 +175,15 @@ class DeviceWidget(QWidget):
         
     def set_border_color(self):
         if(self.model.active_status == True):
-            self.colored_widget.setProperty("connected", "green")
+            self.colored_widget.setProperty("active_status", "green")
         else:
-            self.colored_widget.setProperty("connected", "red")
+            self.colored_widget.setProperty("active_status", "red")
             
         self.colored_widget.style().unpolish(self.colored_widget)
         self.colored_widget.style().polish(self.colored_widget)
         self.set_connecton_label()
+    
+    
     
     def mouseclick(self, sender: QMouseEvent):
         if(sender.button() == Qt.MouseButton.RightButton):

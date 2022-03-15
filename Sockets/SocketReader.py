@@ -33,6 +33,8 @@ class SocketReader(QThread):
         self.device = DeviceModel()
         # self.model.add_device(self.device)
         self.newDevice.emit(self.device)
+        self.device.set_connection_status(True)
+        
         
         GlobalLog.add_to_log("New Device Added")
         datastring = b""
