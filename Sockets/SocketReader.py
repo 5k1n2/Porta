@@ -10,6 +10,7 @@ import socket, time
 import struct
 import threading
 from model import GlobalLog
+from model.DeviceInfo import DeviceInfo
 
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
@@ -51,7 +52,11 @@ class SocketReader(QThread):
             decoded = finaldata.decode("utf-8")
 
             tmp = json.loads(decoded)
-            print(tmp)
+            
+            # for line in tmp:
+            #     self.device.deviceInfo[line] = tmp[line]
+                
+            self.device.deviceInfo.update(tmp)
             finaldata = b""
             # text = data.decode()
 

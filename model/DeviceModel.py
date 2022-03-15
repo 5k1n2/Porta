@@ -6,7 +6,7 @@ class DeviceModel(object):
     def __init__(self) -> None:
         
         self.window = None
-        self.deviceInfo = DeviceInfo("tset")
+        self.deviceInfo = DeviceInfo()
         self.connected_Host = "test"
         self.connected_Port = "Port"
         self.inputs = []

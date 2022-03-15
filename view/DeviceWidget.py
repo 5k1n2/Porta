@@ -62,18 +62,6 @@ class DeviceWidget(QWidget):
         self.set_connecton_label()
         self.main_layout.addWidget(self.connectionLabel)
         
-        # Button Layout 3
-        self.buttonLayout3 = QHBoxLayout()
-        
-        self.sendButton = QPushButton("Send Signals")
-        self.sendButton.setMinimumHeight(30)
-        self.sendButton.clicked.connect(self.send_button_clicked)
-        if(len(self.model.inputs) < 1):
-            self.sendButton.setEnabled(False)
-
-        self.buttonLayout3.addWidget(self.sendButton, alignment=Qt.AlignBottom)
-
-        self.main_layout.addLayout(self.buttonLayout3)
         
         
         # Button Layout 2
@@ -183,10 +171,7 @@ class DeviceWidget(QWidget):
         
     def settings_button_clicked(self):
         self.model.open_settings()       
-        
-    def send_button_clicked(self):
-        self.model.open_send_signal()        
-                
+
         
     def set_border_color(self):
         if(self.model.active_status == True):
