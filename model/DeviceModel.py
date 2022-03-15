@@ -22,3 +22,6 @@ class DeviceModel(object):
     
     def open_log(self):
         print("open log")
+        
+    def set_connection_status(self, active: bool):
+        self.active_status = active

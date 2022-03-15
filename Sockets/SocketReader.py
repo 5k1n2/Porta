@@ -43,6 +43,9 @@ class SocketReader(QThread):
         while True:
 
             data = conn.recv(4)
+            if data == b"":
+                self.device.set_connection_status(False)
+                break
             remaining = struct.unpack(">I", data)[0]
             while remaining >= 0:
 
