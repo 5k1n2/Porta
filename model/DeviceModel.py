@@ -47,7 +47,12 @@ class DeviceModel(object):
         if(self.window):
             self.window.update_card_labels()
         
-        self.set_update_timer()
+        if(self.active_status):
+            self.set_update_timer()
+        else:
+            self.seconds_since_last_action = "No Connection"
+            self.window.update_card_labels()
+            
         
     def set_update_timer(self):
         

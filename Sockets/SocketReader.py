@@ -11,7 +11,6 @@ import struct
 import threading
 from model import GlobalLog
 from model.DeviceInfo import DeviceInfo
-import pydevd
 
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
@@ -28,50 +27,13 @@ class SocketReader(QThread):
         self.host = ""
         self.port = 1456
         self.active = False
+        self.threads = []
 
-    def accept(self, conn):
-        
-        self.device = DeviceModel()
-        # self.model.add_device(self.device)
-        self.newDevice.emit(self.device)
-        self.device.set_connection_status(True)
-        
-        
-        GlobalLog.add_to_log("New Device Added")
-        datastring = b""
-        finaldata = b""
-        remaining = None
+    
 
-        i = 0
-        while True:
-
-            data = conn.recv(4)
-            if data == b"":
-                self.device.set_connection_status(False)
-                break
-            remaining = struct.unpack(">I", data)[0]
-            while remaining >= 0:
-
-                finaldata += conn.recv(min(remaining, 1024))
-                remaining = remaining - 1024
-
-            decoded = finaldata.decode("utf-8")
-
-            tmp = json.loads(decoded)
-            
-            # for line in tmp:
-            #     self.device.deviceInfo[line] = tmp[line]
-                
-            self.device.deviceInfo.update(tmp)
-            finaldata = b""
-            # text = data.decode()
-
-
-            time.sleep(0.001)
 
     def run(self):
-        pydevd.settrace(suspend=False, trace_only_current_thread=True)
-        
+        import pydevd;pydevd.settrace(suspend=False)
         self.active = True
         print("run")
         print(socket.gethostbyname(socket.gethostname()))
@@ -86,12 +48,83 @@ class SocketReader(QThread):
                 try:
                     conn, addr = s.accept()
 
-                    thread = threading.Thread(target=self.accept, args=([conn]))
-                    thread.start()
+                    # thread = threading.Thread(target=self.accept, args=([conn]))
+                    # thread.start()
+                    
+                    self.thread = SocketReaderInstance(conn)
+                    self.thread.newDevice.connect(self.newDeviceEmit)
+                    
+                    
+                    self.thread.start()
+                    self.threads.append(self.thread)
                     
                 except socket.timeout:
                     pass
                 
             self.stop()
+            
+    def newDeviceEmit(self, x):
+        self.newDevice.emit(x)
+     
+    
     def stop(self):
         self.active = False
+
+
+class SocketReaderInstance(QThread):
+    
+    newDevice = Signal(DeviceModel)
+    
+    def __init__(self, conn: socket):
+        
+        super().__init__() 
+        self.socket = conn
+        self.device = DeviceModel()
+        # self.model.add_device(self.device)
+        self.device.set_connection_status(True)
+        self.device.connected_Host, self.device.connected_Port = conn.getpeername()
+    
+    def run(self):  
+        import pydevd;pydevd.settrace(suspend=False)
+        
+        
+        print("emit")
+        
+        self.newDevice.emit(self.device)
+        print("new device added")
+        GlobalLog.add_to_log("New Device Added")
+        datastring = b""
+        finaldata = b""
+        remaining = None
+
+        i = 0
+        while True:
+
+            data = self.socket.recv(4)
+            if data == b"":
+                self.device.set_connection_status(False)
+                break
+            remaining = struct.unpack(">I", data)[0]
+            while remaining >= 0:
+
+                finaldata += self.socket.recv(min(remaining, 1024))
+                remaining = remaining - 1024
+
+            decoded = finaldata.decode("utf-8")
+
+            tmp = json.loads(decoded)
+            
+
+            self.device.deviceInfo.update(tmp)
+            device_name = self.device.deviceInfo["name"]
+            print(self)
+            print(device_name)
+            print(tmp)
+            finaldata = b""
+            # text = data.decode()
+            
+            if(self.device.window is not None):
+                self.device.window.update_card_labels()
+
+
+            time.sleep(0.001)
