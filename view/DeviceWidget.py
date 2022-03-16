@@ -4,6 +4,8 @@ from PySide6.QtWidgets import QWidget, QTableWidget, QMenu, QPushButton, QLabel,
 from PySide6.QtGui import QCursor, QPen, QBrush, QAction, QLinearGradient, Qt, QFont, QMouseEvent
 from PySide6.QtCore import QTimer
 
+from view.DeviceLogView import DeviceLogView
+
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from model.DeviceModel import DeviceModel
@@ -67,24 +69,23 @@ class DeviceWidget(QWidget):
         self.set_connecton_label()
         self.main_layout.addWidget(self.connectionLabel)
         
-        
+                
+        # Button Overview
+        self.overview_btn = QPushButton("Overview")
+        self.overview_btn.setMinimumHeight(30)
+        self.overview_btn.clicked.connect(self.overview_btn_clicked)
+
+        self.main_layout.addWidget(self.overview_btn)
         
         # Button Layout 2
-        self.buttonLayout2 = QHBoxLayout()
-        
-        self.startButton = QPushButton("Start")
-        self.startButton.setMinimumHeight(30)
-        self.startButton.clicked.connect(self.start_button_clicked)
-        
-        self.stopButton = QPushButton("Stop")
-        self.stopButton.setMinimumHeight(30)
-        self.stopButton.setEnabled(False)
-        self.stopButton.clicked.connect(self.stop_button_clicked)
-        
-        self.buttonLayout2.addWidget(self.stopButton, alignment=Qt.AlignBottom)
-        self.buttonLayout2.addWidget(self.startButton, alignment=Qt.AlignBottom)
+        self.pause_btn = QPushButton("Pause Transfer")
+        self.pause_btn.setMinimumHeight(30)
+        self.pause_btn.setCheckable(True)
+        self.pause_btn.clicked.connect(self.pause_btn_clicked)
 
-        self.main_layout.addLayout(self.buttonLayout2)
+        self.main_layout.addWidget(self.pause_btn)
+        
+
         
         # Handle mouse click event to show menu
         self.mousePressEvent = self.mouseclick
@@ -99,7 +100,7 @@ class DeviceWidget(QWidget):
         
         self.logButton = QPushButton("Log")
         self.logButton.setMinimumHeight(30)
-        self.logButton.clicked.connect(self.model.open_log)
+        self.logButton.clicked.connect(self.log_btn_clicked)
         
         self.buttonLayout.addWidget(self.settingButton, alignment=Qt.AlignBottom)
         self.buttonLayout.addWidget(self.logButton, alignment=Qt.AlignBottom)
@@ -156,26 +157,30 @@ class DeviceWidget(QWidget):
                             background-color: #e1eaf5;
                         }
                             
+                        QPushButton:checked{
+                            background-color: #5e5e5e;
+                        }
+                        
+                        QPushButton:checked:selected {
+                            background-color: #60798B;
+                        }
                             
                             """)
         
         self.update_card_labels()
         
-    def start_button_clicked(self):
-        rslt = self.model.enable_device()
-        self.colored_widget.setProperty("active_status", "green")
-        self.set_border_color()
-        if(rslt):
-            self.startButton.setEnabled(False)
-            self.stopButton.setEnabled(True)
-    
-    def stop_button_clicked(self):
-        rslt = self.model.disable_device()
-        self.colored_widget.setProperty("active_status", "red")
-        self.set_border_color()
-        if(rslt):
-            self.startButton.setEnabled(True)
-            self.stopButton.setEnabled(False)
+    def pause_btn_clicked(self, sender):
+        
+        print(sender)
+        
+    def overview_btn_clicked(self, sender):
+        
+        print("test")
+
+    def log_btn_clicked(self, sender):
+        
+        self.logview = DeviceLogView(self.model)
+        self.logview.show()
         
     def settings_button_clicked(self):
         self.model.open_settings()       

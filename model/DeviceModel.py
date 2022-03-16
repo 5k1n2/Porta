@@ -13,6 +13,9 @@ class DeviceModel(object):
         self.connected_Host = "test"
         self.connected_Port = "Port"
         self.inputs = []
+        self.log = []
+        self.logevent = []
+        
         self.active_status = False
         self.data = None
         self.seconds_since_last_action = None
@@ -59,3 +62,18 @@ class DeviceModel(object):
         self.timer = Timer(1, self.timer_update)
         self.timer.start()
         
+    def subscribe_log_update(self, k):
+        if(k not in self.logevent):
+            self.logevent.append(k)
+            
+    def unsubscribe_log_update(self, k):
+        if(k in self.logevent):
+            self.logevent.remove(k)
+            
+    def log_update(self):
+        for k in self.logevent:
+            k()
+        
+    def add_to_log(self, m):
+        self.log.append(m)
+        self.log_update()

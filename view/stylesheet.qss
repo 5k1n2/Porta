@@ -83,6 +83,10 @@ QPushButton:pressed{
     background-color: #333333;
 }
 
+QPushButton:checked{
+    background-color: #5e5e5e;
+}
+
 
 
 QScrollBar:horizontal {
