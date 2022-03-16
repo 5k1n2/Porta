@@ -72,6 +72,7 @@ class SocketReader(QThread):
     def run(self):
         
         self.active = True
+        print("run")
         print(socket.gethostbyname(socket.gethostname()))
         
         with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:

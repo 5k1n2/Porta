@@ -18,7 +18,7 @@ class PortaMain(object):
         self.log_widget = LogWidget()
         self.left_side_bar = LeftSideBar(self.window.content_widget, self)
         
-        self.dasboard = Dasboard()
+        self.dasboard = Dasboard(self)
         
         
         self.left_side_bar.add_new_button("Dashboard", self.dasboard)
@@ -54,5 +54,5 @@ class PortaMain(object):
         self.socketReader = None
         
     def add_device(self, device):
-        # self.devices.append(device)
+        self.devices.append(device)
         self.dasboard.window.add_device(device.get_device_widget())

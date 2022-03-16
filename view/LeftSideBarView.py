@@ -116,7 +116,9 @@ class LeftSideBarView(QWidget):
 
         if(self.current_widget is not None):
             self.content_layout.removeWidget(self.current_widget)
-            self.current_widget.deleteLater()
+            # self.current_widget.deleteLater()
+            btn.widget.window = None
+            
 
         self.current_widget = btn.widget.get_window()
         self.content_layout.addWidget(self.current_widget)

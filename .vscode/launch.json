@@ -9,7 +9,16 @@
             "type": "python",
             "request": "launch",
             "program": "Vertex_Porta.py",
-            "console": "integratedTerminal"
+            "console": "integratedTerminal",
+            "justMyCode": true
+        },
+        {
+            "name": "Python: Current File",
+            "type": "python",
+            "request": "launch",
+            "program": "Vertex_Porta.py",
+            "console": "integratedTerminal",
+            "justMyCode": false
         }
     ]
 }

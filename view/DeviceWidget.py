@@ -2,14 +2,15 @@ from __future__ import annotations
 
 from PySide6.QtWidgets import QWidget, QTableWidget, QMenu, QPushButton, QLabel, QVBoxLayout, QSizePolicy, QHBoxLayout, QSpacerItem
 from PySide6.QtGui import QCursor, QPen, QBrush, QAction, QLinearGradient, Qt, QFont, QMouseEvent
-
+from PySide6.QtCore import QTimer
 
 from typing import TYPE_CHECKING
-
+if TYPE_CHECKING:
+    from model.DeviceModel import DeviceModel
 
 
 class DeviceWidget(QWidget):
-    def __init__(self, model):
+    def __init__(self, model:DeviceModel):
         super().__init__()
 
         self.model = model
@@ -32,20 +33,20 @@ class DeviceWidget(QWidget):
         secondFont = QFont("Verdana", 13)
         descriptionFont = QFont("Verdana", 9)
         
-        self.title = QLabel(self.model.deviceInfo.title)
+        self.title = QLabel(self.model.deviceInfo["name"])
         self.title.setFont(titleFont)
         self.title.setAlignment(Qt.AlignCenter)   
 
-        self.fancyName = QLabel(self.model.deviceInfo.fancyName)
+        self.fancyName = QLabel(self.model.deviceInfo["fancyName"])
         self.fancyName.setFont(secondFont)
         self.fancyName.setAlignment(Qt.AlignCenter)   
         
-        self.description = QLabel(self.model.deviceInfo.description)
+        self.description = QLabel(self.model.deviceInfo["description"])
         self.description.setFont(descriptionFont)
         self.description.setAlignment(Qt.AlignCenter)   
         self.description.setWordWrap(True)   
         
-        self.name = self.model.deviceInfo.description
+        self.name = self.model.deviceInfo["description"]
         
         self.main_layout.addWidget(self.title, alignment=Qt.AlignTop)
         self.main_layout.addWidget(self.fancyName, alignment=Qt.AlignTop)
@@ -57,6 +58,10 @@ class DeviceWidget(QWidget):
         
         
         # Connected to Label
+        
+        self.last_update_lbl = QLabel()
+        # self.last_update_lbl.setText(self.model.seconds_since_last_action)
+        self.main_layout.addWidget(self.last_update_lbl)
         
         self.connectionLabel = QLabel()
         self.set_connecton_label()
@@ -153,6 +158,9 @@ class DeviceWidget(QWidget):
                             
                             
                             """)
+        
+        self.update_card_labels()
+        
     def start_button_clicked(self):
         rslt = self.model.enable_device()
         self.colored_widget.setProperty("active_status", "green")
@@ -209,5 +217,15 @@ class DeviceWidget(QWidget):
         else:
             self.connectionLabel.setText(self.connection_lbl)
         
+
     
+
+    
+    def update_card_labels(self):
+        
+        self.title.setText(self.model.deviceInfo["name"])
+        self.fancyName.setText(self.model.deviceInfo["fancyName"])
+        self.description.setText(self.model.deviceInfo["description"])
+        self.set_connecton_label()        
+        self.last_update_lbl.setText("Time since last Update {}s".format(self.model.seconds_since_last_action))
         
