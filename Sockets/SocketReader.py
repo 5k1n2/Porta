@@ -11,6 +11,7 @@ import struct
 import threading
 from model import GlobalLog
 from model.DeviceInfo import DeviceInfo
+import pydevd
 
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
@@ -68,8 +69,8 @@ class SocketReader(QThread):
 
             time.sleep(0.001)
 
-
     def run(self):
+        pydevd.settrace(suspend=False, trace_only_current_thread=True)
         
         self.active = True
         print("run")
