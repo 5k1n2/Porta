@@ -1,13 +1,20 @@
+import string
+import threading
+from tokenize import String
 from view.DeviceWidget import DeviceWidget
 from model.DeviceInfo import DeviceInfo
 import datetime
 from threading import Timer
 from multiprocessing import Pool
+from PySide6.QtCore import Signal, QObject
 
-class DeviceModel(object):
+class DeviceModel(QObject):
+    
+    newLog = Signal(str)
+    clearAllLogs = Signal()
     
     def __init__(self) -> None:
-        
+        super().__init__()
         self.window = None
         self.deviceInfo = DeviceInfo(self)
         self.connected_Host = "test"
@@ -28,6 +35,7 @@ class DeviceModel(object):
         
         if(self.window is None):
             self.window = DeviceWidget(self)
+            self.window.clearLog.connect(lambda: self.clearAllLogs.emit())
         return self.window
     
     def open_log(self):
@@ -38,11 +46,14 @@ class DeviceModel(object):
         if(self.window is not None):
             self.window.set_border_color()
             
-    def update_log(self):
+    def update_log(self, dict):
         
         self.last_datetime = datetime.datetime.now()
+        self.add_to_log("New input recieved: {}".format(dict))
             
     def timer_update(self):
+        
+        
         
         tmp = datetime.datetime.now() - self.last_datetime
         self.seconds_since_last_action = tmp.seconds
@@ -60,7 +71,9 @@ class DeviceModel(object):
     def set_update_timer(self):
         
         self.timer = Timer(1, self.timer_update)
+        
         self.timer.start()
+        
         
     def subscribe_log_update(self, k):
         if(k not in self.logevent):
@@ -70,10 +83,9 @@ class DeviceModel(object):
         if(k in self.logevent):
             self.logevent.remove(k)
             
-    def log_update(self):
-        for k in self.logevent:
-            k()
+    def add_to_log(self, msg):
         
-    def add_to_log(self, m):
-        self.log.append(m)
-        self.log_update()
+        self.log.append(msg)
+        
+        self.newLog.emit(msg)
+            

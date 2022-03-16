@@ -1,8 +1,9 @@
 from __future__ import annotations
+import threading
 
 from PySide6.QtWidgets import QWidget, QTableWidget, QMenu, QPushButton, QLabel, QVBoxLayout, QSizePolicy, QHBoxLayout, QSpacerItem
 from PySide6.QtGui import QCursor, QPen, QBrush, QAction, QLinearGradient, Qt, QFont, QMouseEvent
-from PySide6.QtCore import QTimer
+from PySide6.QtCore import Signal
 
 from view.DeviceLogView import DeviceLogView
 
@@ -12,6 +13,9 @@ if TYPE_CHECKING:
 
 
 class DeviceWidget(QWidget):
+    
+    clearLog = Signal()
+    
     def __init__(self, model:DeviceModel):
         super().__init__()
 
@@ -181,6 +185,8 @@ class DeviceWidget(QWidget):
         
         self.logview = DeviceLogView(self.model)
         self.logview.show()
+        self.logview.clearLog.connect(lambda: self.clearLog.emit())
+        print(threading.current_thread())
         
     def settings_button_clicked(self):
         self.model.open_settings()       

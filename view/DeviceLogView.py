@@ -1,6 +1,8 @@
 from __future__ import annotations
 from PySide6.QtWidgets import QWidget, QLabel, QVBoxLayout, QHBoxLayout, QPlainTextEdit, QPushButton
 from PySide6.QtGui import Qt, QFont
+from PySide6.QtCore import Signal
+import threading
 
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
@@ -8,12 +10,15 @@ if TYPE_CHECKING:
 
 class DeviceLogView(QWidget):
     
+    clearLog = Signal()
+
     def __init__(self, model:DeviceModel):
         super().__init__()
         
         self.device = model
+        self.device.clearAllLogs.connect(self.clear_log)
 
-        
+        self.device.newLog.connect(self.add_to_log)
         with open("view/stylesheet.qss", "r") as k:
             self.setStyleSheet(k.read())
         
@@ -54,7 +59,7 @@ class DeviceLogView(QWidget):
         
         self.logButton = QPushButton("Clear Log")
         self.logButton.setFixedSize(150, 40)
-        self.logButton.clicked.connect(self.clear_log)
+        self.logButton.clicked.connect(self.clear_log_clicked)
         
         self.cancelButton = QPushButton("Close")
         self.cancelButton.setFixedSize(150, 40)
@@ -67,11 +72,11 @@ class DeviceLogView(QWidget):
         self.main_layout.addLayout(self.contentLayout)
         self.main_layout.addLayout(self.buttonRow)
 
-        self.resize(self.sizeHint())
+        self.resize(self.sizeHint().width() *4, self.sizeHint().height() *2)
         
-        self.device.subscribe_log_update(self.update_log_view)
+        self.device.subscribe_log_update(self.add_to_log)
         
-        self.device.log_update()
+        self.update_log_view()
         
         self.device.add_to_log("Log opened")
         
@@ -80,9 +85,15 @@ class DeviceLogView(QWidget):
     def close_window(self):
         self.close()
         
+    def clear_log_clicked(self):
+        self.clearLog.emit()
+        
     def clear_log(self):
-        self.device.log.clear()
-        self.device.log_update()
+        self.logWidget.clear()
+        
+    def add_to_log(self, msg):
+        
+        self.logWidget.appendPlainText(msg)
         
     def update_log_view(self):
         self.logWidget.clear()

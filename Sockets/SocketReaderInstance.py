@@ -52,12 +52,11 @@ class SocketReaderInstance(QThread):
 
             tmp = json.loads(decoded)
             
+            self.device.update_log(tmp)
 
             self.device.deviceInfo.update(tmp)
             device_name = self.device.deviceInfo["name"]
-            print(self)
-            print(device_name)
-            print(tmp)
+
             finaldata = b""
             # text = data.decode()
             

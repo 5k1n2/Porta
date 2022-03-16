@@ -1,5 +1,6 @@
 class DeviceInfo(dict):
     
+    
     def __init__(self, model) -> None:
         super().__init__()
         
@@ -12,7 +13,6 @@ class DeviceInfo(dict):
         
     def update(self, new_dict, current_layer = None):
         
-        self.model.update_log()
         
         if current_layer is None:
             current_layer = self
