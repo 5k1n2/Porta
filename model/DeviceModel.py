@@ -12,6 +12,8 @@ class DeviceModel(QObject):
     
     newLog = Signal(str)
     clearAllLogs = Signal()
+    updateElement = Signal(dict)
+
     
     def __init__(self) -> None:
         super().__init__()

@@ -5,6 +5,7 @@ from PySide6.QtWidgets import QWidget, QTableWidget, QMenu, QPushButton, QLabel,
 from PySide6.QtGui import QCursor, QPen, QBrush, QAction, QLinearGradient, Qt, QFont, QMouseEvent
 from PySide6.QtCore import Signal
 
+from model.Overview import Overview
 from view.DeviceLogView import DeviceLogView
 
 from typing import TYPE_CHECKING
@@ -179,7 +180,8 @@ class DeviceWidget(QWidget):
         
     def overview_btn_clicked(self, sender):
         
-        print("test")
+        self.overview = Overview(self.model)
+        self.overview.get_window()
 
     def log_btn_clicked(self, sender):
         
