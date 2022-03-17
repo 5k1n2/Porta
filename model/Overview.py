@@ -19,9 +19,6 @@ class Overview(QObject):
         self.device_inputs = self.device_model.deviceInfo["inputs"]
 
 
-        for input in self.device_inputs:
-            print(self.device_inputs[input])
-
 
     def get_window(self):
 

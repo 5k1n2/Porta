@@ -75,7 +75,7 @@ class OverviewView(QWidget):
 
 
     def update_element(self, sender):
-        print(sender)
+
         
         for element in sender["inputs"]:
             single_element = sender["inputs"][element]
