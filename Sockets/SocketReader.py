@@ -82,7 +82,7 @@ class SocketReaderInstance(QThread):
         self.device = DeviceModel()
         # self.model.add_device(self.device)
         self.device.set_connection_status(True)
-        self.device.connected_Host, self.device.connected_Port = conn.getpeername()
+        self.device.connected_Host, self.device.connected_Port = conn.getsockname()
     
     def run(self):  
         import pydevd;pydevd.settrace(suspend=False)
@@ -99,12 +99,12 @@ class SocketReaderInstance(QThread):
 
         i = 0
         while True:
-
+            data:bytes
             data = self.socket.recv(4)
             if data == b"":
                 self.device.set_connection_status(False)
                 break
-            remaining = struct.unpack(">I", data)[0]
+            remaining = int.from_bytes(data, "little")
             while remaining >= 0:
 
                 finaldata += self.socket.recv(min(remaining, 1024))
