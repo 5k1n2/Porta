@@ -28,6 +28,7 @@ class SocketReader(QThread):
         self.port = 1456
         self.active = False
         self.threads = []
+        self.isGamehost = False
 
     
 
@@ -69,6 +70,8 @@ class SocketReader(QThread):
     
     def stop(self):
         self.active = False
+        
+
 
 
 class SocketReaderInstance(QThread):
@@ -121,8 +124,22 @@ class SocketReaderInstance(QThread):
             finaldata = b""
             # text = data.decode()
             
+            if(device_name == "Gamehost"):
+                self.sendUpdate("Gamehost connected to Hub")
+                GlobalLog.add_to_log("{} connected to Hub".format(device_name))
+                
+            
             if(self.device.window is not None):
                 self.device.window.update_card_labels()
 
 
             time.sleep(0.001)
+            
+    def sendUpdate(self, update_msg):
+        
+        message = """{"name" : "deviceWeapon","inputs" :{"input1" :{"name" : "trigger1","fancyName" : "Trigger","description" : "Das ist der Trigger der Waffe","value" : "float","default" : 0,"hidden" : false}}}"""
+        
+        
+        length = len(message).to_bytes(4, "little")
+
+        self.socket.sendall(length + message.encode("utf-8"))
