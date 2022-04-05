@@ -11,10 +11,12 @@ import struct
 import threading
 from model import GlobalLog
 from model.DeviceInfo import DeviceInfo
+from model.GamehostModel import GamehostModel
 
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from model.PortaMain import PortaMain
+
 
 class SocketReader(QThread):
     
@@ -82,10 +84,6 @@ class SocketReaderInstance(QThread):
         
         super().__init__() 
         self.socket = conn
-        self.device = DeviceModel()
-        # self.model.add_device(self.device)
-        self.device.set_connection_status(True)
-        self.device.connected_Host, self.device.connected_Port = conn.getsockname()
     
     def run(self):  
         import pydevd;pydevd.settrace(suspend=False)
@@ -93,9 +91,7 @@ class SocketReaderInstance(QThread):
         
         print("emit")
         
-        self.newDevice.emit(self.device)
-        print("new device added")
-        GlobalLog.add_to_log("New Device Added")
+
         datastring = b""
         finaldata = b""
         remaining = None
@@ -117,20 +113,39 @@ class SocketReaderInstance(QThread):
 
             tmp = json.loads(decoded)
             
-            self.device.update_log(tmp)
-            self.device.deviceInfo.update_dict(tmp)
-            device_name = self.device.deviceInfo["name"]
+            if(tmp["kind"] == 0):
+                
+                
+                self.device = DeviceModel()
+                # self.model.add_device(self.device)
+                self.device.set_connection_status(True)
+                self.device.connected_Host, self.device.connected_Port = self.socket.getsockname()
+            
+                self.newDevice.emit(self.device)
+                print("new device added")
+                GlobalLog.add_to_log("New Device Added")
+
+                self.device.update_log(tmp)
+                self.device.deviceInfo.update_dict(tmp)
+                device_name = self.device.deviceInfo["name"]
+                
+                if(self.device.window is not None):
+                    self.device.window.update_card_labels()
+                
+            elif(tmp["kind"] == 1):
+                
+                self.device = GamehostModel()
+                print("gamehost added")
+                GlobalLog.add_to_log("New Gamehost Added")
+
+                self.device.deviceInfo.update_dict(tmp)
+                self.newDevice.emit(self.device)
+                
+                
 
             finaldata = b""
             # text = data.decode()
             
-            if(device_name == "Gamehost"):
-                self.sendUpdate("Gamehost connected to Hub")
-                GlobalLog.add_to_log("{} connected to Hub".format(device_name))
-                
-            
-            if(self.device.window is not None):
-                self.device.window.update_card_labels()
 
 
             time.sleep(0.001)

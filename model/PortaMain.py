@@ -13,6 +13,7 @@ class PortaMain(object):
         
         self.socketReader = None
         self.devices = []
+        self.gamehosts = []
         self.active = False
         
         self.log_widget = LogWidget()
@@ -54,5 +55,9 @@ class PortaMain(object):
         self.socketReader = None
         
     def add_device(self, device):
-        self.devices.append(device)
-        self.dasboard.window.add_device(device.get_device_widget())
+        if(device.deviceInfo["kind"] == 0):
+            self.dasboard.window.add_device(device.get_device_widget())
+            self.devices.append(device)
+        else:
+            self.dasboard.window.add_device(device.get_device_widget())
+            self.gamehosts.append(device)
