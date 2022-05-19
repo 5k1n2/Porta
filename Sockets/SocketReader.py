@@ -113,6 +113,7 @@ class SocketReaderInstance(QThread):
 
             tmp = json.loads(decoded)
             
+            
             if(tmp["kind"] == 0):
                 
                 
