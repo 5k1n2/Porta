@@ -75,7 +75,6 @@ class SocketReader(QThread):
         
 
 
-
 class SocketReaderInstance(QThread):
     
     newDevice = Signal(DeviceModel)
@@ -89,7 +88,7 @@ class SocketReaderInstance(QThread):
         import pydevd;pydevd.settrace(suspend=False)
         
         
-        print("emit")
+        print("Start of socket")
         
 
         datastring = b""
@@ -98,20 +97,30 @@ class SocketReaderInstance(QThread):
 
         i = 0
         while True:
+            # recieve length of config byte array
             data:bytes
-            data = self.socket.recv(4)
+            try:
+                data = self.socket.recv(4)
+            except:
+                GlobalLog.add_to_log(f"New Device Config Length recieved not expected input for Device: {self.socket.getsockname()}")
+                break
             if data == b"":
                 self.device.set_connection_status(False)
                 break
-            remaining = int.from_bytes(data, "little")
-            while remaining >= 0:
+            expected = int.from_bytes(data, "little")
+            if(expected < 1):
+                GlobalLog.add_to_log(f"New Device Config Length is lower than expected (< 1) for Device: {self.socket.getsockname()}")
+            # read data from socket
+            finaldata = self.read_from_socket(expected)
 
-                finaldata += self.socket.recv(min(remaining, 1024))
-                remaining = remaining - 1024
 
             decoded = finaldata.decode("utf-8")
 
-            tmp = json.loads(decoded)
+            try:
+                tmp = json.loads(decoded)
+            except json.decoder.JSONDecodeError as e:
+                GlobalLog.add_to_log(f"ERROR: JSON config not valid: {decoded}, {e.msg}")
+                break
             
             
             if(tmp["kind"] == 0):
@@ -121,14 +130,15 @@ class SocketReaderInstance(QThread):
                 # self.model.add_device(self.device)
                 self.device.set_connection_status(True)
                 self.device.connected_Host, self.device.connected_Port = self.socket.getsockname()
-            
-                self.newDevice.emit(self.device)
-                print("new device added")
-                GlobalLog.add_to_log("New Device Added")
+        
 
                 self.device.update_log(tmp)
                 self.device.deviceInfo.update_dict(tmp)
                 device_name = self.device.deviceInfo["name"]
+                
+                self.newDevice.emit(self.device)
+                print("new device added")
+                GlobalLog.add_to_log(f"New Device Added: {device_name}")
                 
                 if(self.device.window is not None):
                     self.device.window.update_card_labels()
@@ -142,6 +152,8 @@ class SocketReaderInstance(QThread):
                 self.device.deviceInfo.update_dict(tmp)
                 self.newDevice.emit(self.device)
                 
+            else:
+                GlobalLog(f"Kind of Device not found for Device: {self.socket.gethostbyname(self.socket.gethostname())}")
                 
 
             finaldata = b""
@@ -150,6 +162,30 @@ class SocketReaderInstance(QThread):
 
 
             time.sleep(0.001)
+            
+    def read_from_socket(self, expected, warning_length = 10, finaldata = b""):
+        
+
+            reamining = expected
+            
+            try:
+                # read socket data               
+                
+                while reamining > 0:
+
+                    finaldata += self.socket.recv(min(reamining, 1024))
+                    reamining -= 1024
+                
+                # check if all expected data was recieved. If not continue reading. Usually requiered for very slow clients
+                length = len(finaldata)
+                if (len(finaldata) < expected):
+                    warning_length =- 1
+                    if(warning_length == 0):
+                        GlobalLog.add_to_log(f"Unusual many attempts to recieve full Data of Socket for Device: {self.socket.getsockname()}")
+                    finaldata = self.read_from_socket(expected - len(finaldata), warning_length=warning_length, finaldata=finaldata)
+            except Exception as e:
+                GlobalLog.add_to_log(f"Socket returned an Error for Device: {self.socket.getsockname()}, {e}")
+            return finaldata
             
     def sendUpdate(self, update_msg):
         
