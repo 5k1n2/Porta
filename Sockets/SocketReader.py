@@ -98,21 +98,10 @@ class SocketReaderInstance(QThread):
         i = 0
         while True:
             # recieve length of config byte array
-            data:bytes
-            try:
-                data = self.socket.recv(4)
-            except:
-                GlobalLog.add_to_log(f"New Device Config Length recieved not expected input for Device: {self.socket.getsockname()}")
-                break
-            if data == b"":
-                self.device.set_connection_status(False)
-                break
-            expected = int.from_bytes(data, "little")
-            if(expected < 1):
-                GlobalLog.add_to_log(f"New Device Config Length is lower than expected (< 1) for Device: {self.socket.getsockname()}")
+            expected = self.read_expected_length()
+            
             # read data from socket
             finaldata = self.read_from_socket(expected)
-
 
             decoded = finaldata.decode("utf-8")
 
@@ -163,6 +152,24 @@ class SocketReaderInstance(QThread):
 
             time.sleep(0.001)
             
+    def read_expected_length(self):
+        
+        # recieve length of config byte array
+        data:bytes
+        try:
+            data = self.socket.recv(4)
+        except:
+            GlobalLog.add_to_log(f"New Device Config Length recieved not expected input for Device: {self.socket.getsockname()}")
+            return 0
+        if data == b"":
+            self.device.set_connection_status(False)
+            return 0
+        expected = int.from_bytes(data, "little")
+        if(expected < 1):
+            GlobalLog.add_to_log(f"New Device Config Length is lower than expected (< 1) for Device: {self.socket.getsockname()}")
+            
+        return expected
+    
     def read_from_socket(self, expected, warning_length = 10, finaldata = b""):
         
 
@@ -185,6 +192,8 @@ class SocketReaderInstance(QThread):
                     finaldata = self.read_from_socket(expected - len(finaldata), warning_length=warning_length, finaldata=finaldata)
             except Exception as e:
                 GlobalLog.add_to_log(f"Socket returned an Error for Device: {self.socket.getsockname()}, {e}")
+                
+            
             return finaldata
             
     def sendUpdate(self, update_msg):
