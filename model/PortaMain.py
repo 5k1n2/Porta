@@ -61,3 +61,6 @@ class PortaMain(object):
         else:
             self.dasboard.window.add_device(device.get_device_widget())
             self.gamehosts.append(device)
+            
+    def remove_device(self, device):
+        pass

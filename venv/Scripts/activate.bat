@@ -1,6 +1,6 @@
 @echo off
 
-set "VIRTUAL_ENV=F:\Vertex_Porta\venv"
+set "VIRTUAL_ENV=C:\Porta.git\venv"
 
 if defined _OLD_VIRTUAL_PROMPT (
     set "PROMPT=%_OLD_VIRTUAL_PROMPT%"

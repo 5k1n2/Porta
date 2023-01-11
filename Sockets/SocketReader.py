@@ -131,6 +131,15 @@ class SocketReaderInstance(QThread):
                 
                 if(self.device.window is not None):
                     self.device.window.update_card_labels()
+                    
+                while(True):
+                    # recieve length of config byte array
+                    expected = self.read_expected_length()
+                    if expected == 0:
+                        break
+                    # read data from socket
+                    finaldata = self.read_from_socket(expected)
+                    print(finaldata)
                 
             elif(tmp["kind"] == 1):
                 
