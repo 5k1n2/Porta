@@ -140,7 +140,7 @@ class SocketReaderInstance(QThread):
                     # read data from socket
                     finaldata = self.read_from_socket(expected)
                     print(finaldata)
-                    self.device.add_to_log(finaldata.decode("utf-8"))
+                    self.device.add_to_log(finaldata.decode())
                 
             elif(tmp["kind"] == 1):
                 
