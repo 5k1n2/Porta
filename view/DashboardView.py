@@ -35,4 +35,8 @@ class DashboardView(QScrollArea):
         self.device_area.addWidget(deviceCard)
         print("add device")
         
+    def remove_device(self, deviceCard):
+        self.device_area.removeWidget(deviceCard)
+        print("removed device")
+        
 

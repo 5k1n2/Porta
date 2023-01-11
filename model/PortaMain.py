@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from view.PortaMainView import PortaMainView
 from model.LeftSideBar import LeftSideBar
 from model.LogWidget import LogWidget
@@ -5,6 +7,9 @@ from model.Dashboard import Dasboard
 from model import ActiveEvent
 from Sockets.SocketReader import SocketReader
 
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from model.DeviceModel import DeviceModel
 
 class PortaMain(object):
     def __init__(self) -> None:
@@ -12,7 +17,7 @@ class PortaMain(object):
         self.window = self.get_window()
         
         self.socketReader = None
-        self.devices = []
+        self.devices: list[DeviceModel] = []
         self.gamehosts = []
         self.active = False
         
@@ -54,13 +59,19 @@ class PortaMain(object):
         
         self.socketReader = None
         
-    def add_device(self, device):
+    def add_device(self, device: DeviceModel):
         if(device.deviceInfo["kind"] == 0):
+            
+            for singleDevice in self.devices:
+                if(singleDevice.connected_Host == device.connected_Host):
+                    self.remove_device(singleDevice)
+            
             self.dasboard.window.add_device(device.get_device_widget())
             self.devices.append(device)
         else:
             self.dasboard.window.add_device(device.get_device_widget())
             self.gamehosts.append(device)
             
-    def remove_device(self, device):
-        pass
+    def remove_device(self, device: DeviceModel):
+        self.devices.remove(device)
+        self.dasboard.window.remove_device(device.get_device_widget())
