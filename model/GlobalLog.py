@@ -14,6 +14,7 @@ def update_log(msg):
         sub(msg)
         
 def add_to_log(msg):
+    print(msg)
     update_log(msg)
     log.append(msg)
     

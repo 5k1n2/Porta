@@ -4,8 +4,11 @@ from view.PortaMainView import PortaMainView
 from model.LeftSideBar import LeftSideBar
 from model.LogWidget import LogWidget
 from model.Dashboard import Dasboard
+from model.DeviceInfo import DeviceInfo
+from model.GamehostModel import GamehostModel
 from model import ActiveEvent
 from Sockets.SocketReader import SocketReader
+from Sockets.SocketConnection import SocketConnection
 
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
@@ -75,3 +78,14 @@ class PortaMain(object):
     def remove_device(self, device: DeviceModel):
         self.devices.remove(device)
         self.dasboard.window.remove_device(device.get_device_widget())
+
+    def add_gamehost(self):
+        self.gamehost = SocketConnection("172.30.253.25", 1457)
+        self.gamehost.newGamehost.connect(self.add_gamehost_card)
+
+        self.gamehost.start()
+
+    def add_gamehost_card(self, gamehost: GamehostModel):
+ 
+        self.dasboard.window.add_device(gamehost.get_device_widget())
+        self.gamehosts.append(gamehost)

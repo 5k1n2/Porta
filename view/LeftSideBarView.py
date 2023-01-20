@@ -53,6 +53,13 @@ class LeftSideBarView(QWidget):
         self.setLayout(self.mainLayout)
 
 
+        # add gamehost
+
+        self.addGamehost = Tab("Add Gamehost")
+        self.coloredWidgetLayout.addWidget(self.addGamehost)
+        self.addGamehost.button.clicked.connect(self.main_model.add_gamehost)
+
+
         # Add start stop Button
 
         self.startButton = Tab("Start")
@@ -71,6 +78,7 @@ class LeftSideBarView(QWidget):
         self.coloredWidgetLayout.addWidget(self.lbl_active, alignment=Qt.AlignCenter)
         
         ActiveEvent.update_active(False)
+
         
         
         
@@ -83,6 +91,8 @@ class LeftSideBarView(QWidget):
                             border-radius: 10px;
                             
                             }""")
+
+
     
     def add_button(self, btn: Button):
         
