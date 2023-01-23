@@ -9,14 +9,19 @@ from model.GamehostModel import GamehostModel
 from model import ActiveEvent
 from Sockets.SocketReader import SocketReader
 from Sockets.SocketConnection import SocketConnection
+from PySide6.QtCore import Signal, QObject
 
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from model.DeviceModel import DeviceModel
 
-class PortaMain(object):
+class PortaMain(QObject):
+
+    relayMsg = Signal(bytearray)
+
+
     def __init__(self) -> None:
-        
+        super().__init__()
         self.window = self.get_window()
         
         self.socketReader = None
@@ -52,6 +57,7 @@ class PortaMain(object):
         self.socketReader = SocketReader(self)
         self.socketReader.setObjectName("SocketReaderThread")
         self.socketReader.newDevice.connect(self.add_device)
+        self.socketReader.sendMsg.connect(self.relay_msg)
         self.socketReader.start()
         
     def stop_server(self):
@@ -80,12 +86,15 @@ class PortaMain(object):
         self.dasboard.window.remove_device(device.get_device_widget())
 
     def add_gamehost(self):
-        self.gamehost = SocketConnection("172.30.253.25", 1457)
+        self.gamehost = SocketConnection("172.30.253.25", 51234, self)
         self.gamehost.newGamehost.connect(self.add_gamehost_card)
-
+        
         self.gamehost.start()
 
     def add_gamehost_card(self, gamehost: GamehostModel):
- 
+
         self.dasboard.window.add_device(gamehost.get_device_widget())
         self.gamehosts.append(gamehost)
+
+    def relay_msg(self, msg):
+        self.relayMsg.emit(msg)

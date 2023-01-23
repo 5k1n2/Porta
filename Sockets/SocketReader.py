@@ -20,6 +20,7 @@ if TYPE_CHECKING:
 
 class SocketReader(QThread):
     
+    sendMsg = Signal(bytearray)
     newDevice = Signal(DeviceModel)
     
     def __init__(self, model: PortaMain) -> None:
@@ -54,8 +55,9 @@ class SocketReader(QThread):
                     # thread = threading.Thread(target=self.accept, args=([conn]))
                     # thread.start()
                     
-                    self.thread = SocketReaderInstance(conn)
+                    self.thread = SocketReaderInstance(conn, self.model)
                     self.thread.newDevice.connect(self.newDeviceEmit)
+                    self.thread.sendMsg.connect(self.sendMsgEmit)
                     
                     
                     self.thread.start()
@@ -68,6 +70,9 @@ class SocketReader(QThread):
             
     def newDeviceEmit(self, x):
         self.newDevice.emit(x)
+
+    def sendMsgEmit(self, x):
+        self.sendMsg.emit(x)
      
     
     def stop(self):
@@ -78,10 +83,12 @@ class SocketReader(QThread):
 class SocketReaderInstance(QThread):
     
     newDevice = Signal(DeviceModel)
+    sendMsg = Signal(bytearray)
     
-    def __init__(self, conn: socket):
+    def __init__(self, conn: socket, model):
         
         super().__init__() 
+        self.model = model
         self.socket = conn
     
     def run(self):  
@@ -141,6 +148,8 @@ class SocketReaderInstance(QThread):
                     finaldata = self.read_from_socket(expected)
                     print(finaldata)
                     self.device.add_to_log(finaldata.decode())
+                    self.sendMsg.emit(finaldata)
+                    
                 
             elif(tmp["kind"] == 1):
                 

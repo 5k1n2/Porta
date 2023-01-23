@@ -16,10 +16,12 @@ class SocketConnection(QThread):
 
     newGamehost = Signal(GamehostModel)
 
-    def __init__(self, ip, port) -> None:
+    def __init__(self, ip, port, parent) -> None:
         super().__init__()
         self.ip = ip
         self.port = port
+        self.parent = parent
+        self.parent.relayMsg.connect(self.send_msg)
 
     def run(self):
         threading.current_thread().name = "Gamehost"
@@ -30,7 +32,7 @@ class SocketConnection(QThread):
         try:
             self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             # self.socket.settimeout(1)
-            self.socket.connect((self.ip, int(self.port)))
+            self.socket.connect((self.ip, int(51234)))
             # GlobalLog.add_to_log("Established connection from {} to {}".format(self.device.deviceInfo.fancyName, self.device.ip))
             
 
@@ -46,3 +48,6 @@ class SocketConnection(QThread):
             # GlobalLog.add_to_log("Can't establish connection from {} to {}".format(self.device.deviceInfo.fancyName, self.device.ip))
             print(e)
             return False
+
+    def send_msg(self, msg):
+        self.socket.sendall(msg)
